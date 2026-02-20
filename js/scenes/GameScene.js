@@ -21,13 +21,33 @@ class GameScene extends Phaser.Scene {
         this.lifeSystem.onLifeChanged = (tokens, max) => this._updateLifeDisplay(tokens, max);
         this.lifeSystem.onGameOver = () => this._gameOver();
 
+        // Parse URL params for difficulty
+        const urlParams = new URLSearchParams(window.location.search);
+        const difficultyStr = urlParams.get('diff') || 'normal';
+
+        // Base game configs. We'll adjust based on difficulty
+        let spawnIntervalMulti = 1.0;
+        let speedMulti = 1.0;
+
+        if (difficultyStr === 'easy') {
+            spawnIntervalMulti = 1.5; // Spawns are slower
+            speedMulti = 0.7;         // Movement is slower
+        } else if (difficultyStr === 'hard') {
+            spawnIntervalMulti = 0.6; // Spawns are faster
+            speedMulti = 1.4;         // Movement is faster
+        } else if (difficultyStr === 'insane') {
+            spawnIntervalMulti = 0.4; // Spawns are very fast
+            speedMulti = 2.0;         // Movement is very fast
+        }
+
         this.spawner = new Spawner(this, {
-            initialInterval: GameConfig.INITIAL_SPAWN_INTERVAL,
-            minInterval: GameConfig.MIN_SPAWN_INTERVAL,
+            difficulty: difficultyStr,
+            initialInterval: GameConfig.INITIAL_SPAWN_INTERVAL * spawnIntervalMulti,
+            minInterval: GameConfig.MIN_SPAWN_INTERVAL * spawnIntervalMulti,
             intervalDecay: GameConfig.SPAWN_INTERVAL_DECAY,
-            initialSpeed: GameConfig.INITIAL_FLOAT_SPEED,
-            maxSpeed: GameConfig.MAX_FLOAT_SPEED,
-            speedIncrease: GameConfig.SPEED_INCREASE,
+            initialSpeed: GameConfig.INITIAL_FLOAT_SPEED * speedMulti,
+            maxSpeed: GameConfig.MAX_FLOAT_SPEED * speedMulti,
+            speedIncrease: GameConfig.SPEED_INCREASE * speedMulti,
         });
 
         // ===== Visuals =====

@@ -1,5 +1,5 @@
 /**
- * GreekCNN — Browser-side Greek letter recognition using ONNX Runtime Web.
+ * DigitCNN — Browser-side digit recognition using ONNX Runtime Web.
  * Loads a trained CNN model and performs inference on canvas drawings.
  */
 
@@ -17,20 +17,20 @@ class DigitCNN {
      */
     async init() {
         try {
-            console.log('[GreekCNN] Loading model...');
+            console.log('[DigitCNN] Loading model...');
 
             // Load class names
             const classResp = await fetch('model/class_names.json');
             this.classNames = await classResp.json();
-            console.log('[GreekCNN] Class names loaded:', Object.values(this.classNames).map(c => c.symbol).join(' '));
+            console.log('[DigitCNN] Class names loaded:', Object.values(this.classNames).map(c => c.symbol).join(' '));
 
             // Load ONNX model
             this.session = await ort.InferenceSession.create('model/digit_cnn.onnx');
-            console.log('[GreekCNN] Model loaded successfully');
+            console.log('[DigitCNN] Model loaded successfully');
 
             this.ready = true;
         } catch (err) {
-            console.error('[GreekCNN] Failed to load model:', err);
+            console.error('[DigitCNN] Failed to load model:', err);
             this.ready = false;
         }
     }
@@ -42,7 +42,7 @@ class DigitCNN {
      */
     async recognize(canvas) {
         if (!this.ready) {
-            console.warn('[GreekCNN] Model not ready');
+            console.warn('[DigitCNN] Model not ready');
             return { name: 'No match', symbol: '?', confidence: 0 };
         }
 
@@ -77,7 +77,7 @@ class DigitCNN {
         const top3 = sorted.slice(0, 3).map(x =>
             `${this.classNames[String(x.i)].symbol}(${(x.p * 100).toFixed(1)}%)`
         ).join(', ');
-        console.log(`[GreekCNN] Top 3: ${top3} | ${elapsed.toFixed(0)}ms`);
+        console.log(`[DigitCNN] Top 3: ${top3} | ${elapsed.toFixed(0)}ms`);
 
         return {
             name: classInfo ? classInfo.name : 'Unknown',

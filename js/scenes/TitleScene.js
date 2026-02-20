@@ -23,6 +23,12 @@ class TitleScene extends Phaser.Scene {
 
         this._buildBackground(w, h);
         this._buildMinibus(w, h);
+
+        // State for difficulty
+        this.difficulties = ['easy', 'normal', 'hard', 'insane'];
+        this.diffIndex = 2; // Default to 'hard'
+        this.difficulty = this.difficulties[this.diffIndex];
+
         this._buildUI(w, h);
     }
 
@@ -66,9 +72,11 @@ class TitleScene extends Phaser.Scene {
         // With the bg scaled to fill h, the road centre is near h * 0.88.
         const busY = h * 0.88;
 
-        // Scale so the bus occupies a natural road-width proportion.
-        // The spritesheet frame is 640 px wide; target ~40 % screen width.
-        const busScale = (w * 0.40) / 640;
+        // Scale so the bus is a comfortable size, preserving aspect ratio.
+        // The original frame is 640x210. 
+        // Let's set a target height of ~20% of the screen height, and let width follow.
+        const targetHeight = h * 0.20;
+        const busScale = targetHeight / 210;
 
         // Create animation once (scene may be restarted)
         if (!this.anims.exists('minibus_eat')) {
@@ -128,11 +136,52 @@ class TitleScene extends Phaser.Scene {
             shadow: { offsetX: 4, offsetY: 4, color: '#000000', blur: 0, stroke: true, fill: true },
         }).setOrigin(0.5);
 
+        // ---- Difficulty Selector ----
+        const diffY = h * 0.35;
+        this.diffText = this.add.text(w / 2, diffY, 'Difficulty: Hard', {
+            fontFamily: 'Outfit, sans-serif',
+            fontSize: '32px',
+            fontStyle: '700',
+            color: '#fdfbf7',
+            stroke: '#4a3b32',
+            strokeThickness: 6,
+        }).setOrigin(0.5);
+
+        // Left Arrow
+        const leftArrow = this.add.text(w / 2 - 160, diffY, '◀', {
+            fontFamily: 'sans-serif',
+            fontSize: '36px',
+            color: '#fdfbf7',
+            stroke: '#4a3b32',
+            strokeThickness: 6,
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+        leftArrow.on('pointerdown', () => {
+            this.diffIndex = (this.diffIndex - 1 + this.difficulties.length) % this.difficulties.length;
+            this._updateDifficultyDisplay();
+            this.tweens.add({ targets: leftArrow, scaleX: 1.3, scaleY: 1.3, duration: 100, yoyo: true });
+        });
+
+        // Right Arrow
+        const rightArrow = this.add.text(w / 2 + 160, diffY, '▶', {
+            fontFamily: 'sans-serif',
+            fontSize: '36px',
+            color: '#fdfbf7',
+            stroke: '#4a3b32',
+            strokeThickness: 6,
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+        rightArrow.on('pointerdown', () => {
+            this.diffIndex = (this.diffIndex + 1) % this.difficulties.length;
+            this._updateDifficultyDisplay();
+            this.tweens.add({ targets: rightArrow, scaleX: 1.3, scaleY: 1.3, duration: 100, yoyo: true });
+        });
+
         // ---- PLAY button ----
         const btnX = w / 2;
         const btnY = h * 0.52;
 
-        const btnBox = this.add.rectangle(btnX, btnY, 240, 80, 0x66ccff)
+        const btnBox = this.add.rectangle(btnX, btnY, 240, 80, 0x8b5a2b)
             .setInteractive({ useHandCursor: true })
             .setStrokeStyle(4, 0x4a3b32);
 
@@ -146,18 +195,24 @@ class TitleScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         btnBox.on('pointerover', () => {
-            btnBox.fillColor = 0xb38cfd;
+            btnBox.fillColor = 0xb5805f;
             this.tweens.add({ targets: [btnBox, btnText], scaleX: 1.08, scaleY: 1.08, duration: 100 });
         });
 
         btnBox.on('pointerout', () => {
-            btnBox.fillColor = 0x66ccff;
+            btnBox.fillColor = 0x8b5a2b;
             this.tweens.add({ targets: [btnBox, btnText], scaleX: 1, scaleY: 1, duration: 100 });
         });
 
         btnBox.on('pointerdown', () => {
-            window.location.href = 'game.html';
+            window.location.href = `game.html?diff=${this.difficulty}`;
         });
+    }
+
+    _updateDifficultyDisplay() {
+        this.difficulty = this.difficulties[this.diffIndex];
+        const displayWord = this.difficulty.charAt(0).toUpperCase() + this.difficulty.slice(1);
+        this.diffText.setText(`Difficulty: ${displayWord}`);
     }
 }
 

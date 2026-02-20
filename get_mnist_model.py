@@ -11,7 +11,7 @@ import onnx
 MODEL_DIR = os.path.join(os.path.dirname(__file__), 'model')
 IMG_SIZE = 28
 BATCH_SIZE = 64
-EPOCHS = 2
+EPOCHS = 6
 LR = 0.001
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -55,17 +55,24 @@ def train():
     os.makedirs(MODEL_DIR, exist_ok=True)
     os.makedirs('data', exist_ok=True)
 
-    # MNIST transforms
-    # Note: MNIST is natively white digit on black background, exactly what we need!
-    transform = transforms.Compose([
+    # Training transforms - add data augmentation for robustness
+    # Since kids drawing usually aren't perfectly centered and sized!
+    train_transform = transforms.Compose([
+        transforms.RandomAffine(degrees=20, translate=(0.15, 0.15), scale=(0.7, 1.2)),
+        transforms.ToTensor(),          # [0, 1] range
+        transforms.Normalize([0.5], [0.5]), # Normalize to [-1, 1]
+    ])
+
+    # Test transforms standard
+    test_transform = transforms.Compose([
         transforms.ToTensor(),          # [0, 1] range
         transforms.Normalize([0.5], [0.5]), # Normalize to [-1, 1]
     ])
 
     # Load datasets
     print("Downloading/Loading MNIST...")
-    train_set = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
-    test_set = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
+    train_set = datasets.MNIST(root='./data', train=True, download=True, transform=train_transform)
+    test_set = datasets.MNIST(root='./data', train=False, download=True, transform=test_transform)
 
     train_loader = DataLoader(train_set, batch_size=BATCH_SIZE, shuffle=True, num_workers=0)
     test_loader = DataLoader(test_set, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
@@ -74,6 +81,7 @@ def train():
     model = DigitCNN(num_classes=10).to(DEVICE)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=LR)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=4, gamma=0.5)
 
     # Fast Training loop
     for epoch in range(EPOCHS):
@@ -97,7 +105,10 @@ def train():
 
         avg_train_loss = train_loss / train_total
         train_acc = 100.0 * train_correct / train_total
-        print(f"Epoch {epoch+1:2d}/{EPOCHS}  train_loss={avg_train_loss:.4f}  train_acc={train_acc:.1f}%")
+        current_lr = optimizer.param_groups[0]['lr']
+        print(f"Epoch {epoch+1:2d}/{EPOCHS}  lr={current_lr:.6f}  train_loss={avg_train_loss:.4f}  train_acc={train_acc:.1f}%")
+        
+        scheduler.step()
 
     # Evaluate
     model.eval()
@@ -124,6 +135,9 @@ def train():
     class_map_path = os.path.join(MODEL_DIR, 'class_names.json')
     with open(class_map_path, 'w', encoding='utf-8') as f:
         json.dump(class_map, f, indent=2)
+
+    # Save PyTorch model just in case
+    torch.save(model.state_dict(), os.path.join(MODEL_DIR, 'digit_cnn.pt'))
 
     # Export to ONNX
     print("\nExporting to ONNX...")

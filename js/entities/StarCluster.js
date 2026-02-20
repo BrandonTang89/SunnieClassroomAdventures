@@ -136,7 +136,11 @@ class StarCluster {
         }
 
         // Float upward
-        const moveAmount = this.speed * deltaSec;
+        // Speed scales based on number of active balloons
+        // User requested formula: speed = 1 + (X-1) * 0.5 where X is active balloons
+        const activeBalloons = this.balloons.filter(b => !b.popped).length;
+        const speedMultiplier = activeBalloons > 0 ? 1 + (activeBalloons - 1) * 0.5 : 1;
+        const moveAmount = this.speed * speedMultiplier * deltaSec;
         this.starGfx.y -= moveAmount;
 
         // Move all non-popped balloons upward too

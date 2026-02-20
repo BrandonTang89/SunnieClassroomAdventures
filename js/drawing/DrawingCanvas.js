@@ -124,7 +124,7 @@ class DrawingCanvas {
 
     async _submit() {
         if (this.points.length < 5) {
-            this._flashFeedback('Draw a letter first!', '#f87171');
+            this._flashFeedback('Draw a digit first!', '#f87171');
             return;
         }
 

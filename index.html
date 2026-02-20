@@ -7,6 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Sunnie's Classroom Adventures — Digit Balloon Pop</title>
+    <link rel="icon" type="image/png" href="img/sunnie_sprite.png">
     <meta name="description" content="Pop balloons by drawing digits! An educational HTML5 game designed for iPad.">
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -32,9 +33,12 @@
     <div id="game-container"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
-    <script src="js/scenes/BootScene.js"></script>
-    <script src="js/scenes/TitleScene.js"></script>
-    <script src="js/game.js"></script>
+    <!-- Scripts (Scene loading & main game) -->
+    <script src="js/scenes/BootScene.js?v=2"></script>
+    <script src="js/scenes/TitleScene.js?v=2"></script>
+    <script src="js/scenes/GameScene.js?v=2"></script>
+    <script src="js/scenes/GameOverScene.js?v=2"></script>
+    <script src="js/game.js?v=2"></script>
 </body>
 
 </html>

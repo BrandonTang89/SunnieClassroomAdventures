@@ -10,6 +10,7 @@ class BootScene extends Phaser.Scene {
     preload() {
         this.load.image('classroom_bg', 'img/classroom_bg.png');
         this.load.image('title_bg', 'img/title_bg.png');
+        this.load.image('sunnie_umbrella', 'img/sunnie_umbrella_no_bg.png');
         // 3-frame horizontal spritesheet (640×210 per frame) generated from sunnie_minibus.png
         this.load.spritesheet('sunnie_minibus', 'img/sunnie_minibus_sheet.png', {
             frameWidth: 640,
