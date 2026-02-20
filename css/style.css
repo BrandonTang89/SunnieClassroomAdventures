@@ -21,23 +21,11 @@ body {
     user-select: none;
 }
 
-/* ===== APP LAYOUT ===== */
-#app {
-    display: flex;
-    width: 100%;
-    height: 100%;
-}
-
-#app.title-mode #game-container {
-    flex: 1;
-}
-
-#app.title-mode #drawing-area {
-    display: none;
-}
-
+/* ===== GAME CONTAINER =====
+   On the title page (index.html) this is the only child of <body>,
+   so it naturally takes 100 % width as a block element.
+   On the game page (game.html) it lives inside the #app flex row. */
 #game-container {
-    flex: 0 0 65%;
     height: 100%;
     position: relative;
     overflow: hidden;
@@ -46,9 +34,18 @@ body {
 
 #game-container canvas {
     display: block;
-    /* Let Phaser's ScaleManager control canvas dimensions.
-       Forcing 100% here overrides Phaser's own sizing and causes
-       stretching when the container changes size (e.g. title-mode). */
+    /* Let Phaser's ScaleManager control canvas dimensions. */
+}
+
+/* ===== APP LAYOUT (game.html only) ===== */
+#app {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+#app > #game-container {
+    flex: 0 0 65%;
 }
 
 /* ===== DRAWING AREA ===== */
@@ -140,7 +137,7 @@ body {
         flex-direction: column;
     }
 
-    #game-container {
+    #app > #game-container {
         flex: 0 0 55%;
     }
 

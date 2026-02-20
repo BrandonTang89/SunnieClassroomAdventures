@@ -29,6 +29,15 @@ window.GameConfig = GameConfig;
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('game-container');
 
+    // Detect which page we are on by checking for the drawing area.
+    // index.html (title): no #drawing-area  →  BootScene + TitleScene
+    // game.html  (game):  has #drawing-area  →  BootScene + GameScene + GameOverScene
+    const isGamePage = document.getElementById('drawing-area') !== null;
+
+    const scenes = isGamePage
+        ? [BootScene, GameScene, GameOverScene]
+        : [BootScene, TitleScene];
+
     const config = {
         type: Phaser.AUTO,
         parent: 'game-container',
@@ -39,12 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
             mode: Phaser.Scale.RESIZE,
             autoCenter: Phaser.Scale.CENTER_BOTH,
         },
-        scene: [BootScene, TitleScene, GameScene, GameOverScene],
+        scene: scenes,
     };
 
     const game = new Phaser.Game(config);
 
-    // Handle resize
+    // Handle window resize
     window.addEventListener('resize', () => {
         game.scale.resize(container.clientWidth, container.clientHeight);
     });
