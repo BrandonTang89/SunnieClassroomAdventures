@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             mode: Phaser.Scale.RESIZE,
             autoCenter: Phaser.Scale.CENTER_BOTH,
         },
-        scene: [BootScene, GameScene, GameOverScene],
+        scene: [BootScene, TitleScene, GameScene, GameOverScene],
     };
 
     const game = new Phaser.Game(config);

@@ -9,6 +9,13 @@ class BootScene extends Phaser.Scene {
 
     preload() {
         this.load.image('classroom_bg', 'img/classroom_bg.png');
+        this.load.image('title_bg', 'img/title_bg.png');
+        this.load.image('oxford_street_bg', 'img/oxford_street_bg.png');
+        this.load.spritesheet('sunnie_minibus', 'img/sunnie_minibus.png', {
+            frameWidth: 204, // Approx width of individual frames
+            frameHeight: 250 // Approx height
+        });
+
         for (let i = 1; i <= 5; i++) {
             this.load.image(`sunnie_${i}`, `img/sunnie_pose_${i}.png`);
         }
@@ -24,7 +31,7 @@ class BootScene extends Phaser.Scene {
 
         // Slight delay for CDN fonts to load
         this.time.delayedCall(200, () => {
-            this.scene.start('GameScene');
+            this.scene.start('TitleScene');
         });
     }
 }

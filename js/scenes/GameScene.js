@@ -9,6 +9,10 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
+        // Ensure the drawing pane is visible 
+        document.getElementById('app').classList.remove('title-mode');
+        window.dispatchEvent(new Event('resize'));
+
         this.clusters = [];
         this.score = 0;
         this.successfulPops = 0; // Track successful draws for Sunnie poses
