@@ -9,18 +9,19 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        // Ensure the drawing pane is visible 
+        // ===== Layout Transition =====
+        // Remove title-mode so #drawing-area is no longer display:none in CSS.
+        // Also force the inline style immediately — this guarantees visibility
+        // even if CSS reflow hasn't completed yet, and ensures DrawingCanvas
+        // can read non-zero dimensions from getBoundingClientRect().
         document.getElementById('app').classList.remove('title-mode');
-        window.dispatchEvent(new Event('resize'));
+        document.getElementById('drawing-area').style.display = 'flex';
 
+        // ===== Synchronous State (needed by update() on first tick) =====
         this.clusters = [];
         this.score = 0;
-        this.successfulPops = 0; // Track successful draws for Sunnie poses
+        this.successfulPops = 0;
 
-        // ===== Background Stars (ambient) =====
-        this._createBackgroundStars();
-
-        // ===== Life System =====
         this.lifeSystem = new LifeSystem(
             GameConfig.MAX_MISSES,
             GameConfig.REFILL_WINDOW_MS
@@ -28,7 +29,6 @@ class GameScene extends Phaser.Scene {
         this.lifeSystem.onLifeChanged = (tokens, max) => this._updateLifeDisplay(tokens, max);
         this.lifeSystem.onGameOver = () => this._gameOver();
 
-        // ===== Spawner =====
         this.spawner = new Spawner(this, {
             initialInterval: GameConfig.INITIAL_SPAWN_INTERVAL,
             minInterval: GameConfig.MIN_SPAWN_INTERVAL,
@@ -38,15 +38,25 @@ class GameScene extends Phaser.Scene {
             speedIncrease: GameConfig.SPEED_INCREASE,
         });
 
-        // ===== HUD =====
-        this._createHUD();
+        // ===== Deferred Visual Setup =====
+        // requestAnimationFrame fires after the browser has recalculated
+        // layout, so the game-container is already at its 65% width.
+        // Resizing Phaser here avoids the canvas being sized to the old
+        // full-width title-mode container and overflowing the drawing area.
+        requestAnimationFrame(() => {
+            const container = document.getElementById('game-container');
+            this.sys.game.scale.resize(container.clientWidth, container.clientHeight);
 
-        // ===== Drawing Canvas Integration =====
-        this.drawingCanvas = new DrawingCanvas('draw-canvas', 'submit-btn');
-        this.drawingCanvas.onRecognized = (result) => this._onLetterRecognized(result);
+            this._createBackgroundStars();
+            this._createHUD();
 
-        // ===== Start =====
-        this.spawner.start();
+            // DrawingCanvas reads getBoundingClientRect() in its constructor.
+            // Deferring until here guarantees #drawing-area has non-zero size.
+            this.drawingCanvas = new DrawingCanvas('draw-canvas', 'submit-btn');
+            this.drawingCanvas.onRecognized = (result) => this._onLetterRecognized(result);
+
+            this.spawner.start();
+        });
     }
 
     _createBackgroundStars() {

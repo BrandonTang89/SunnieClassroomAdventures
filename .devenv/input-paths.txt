@@ -1,0 +1,7 @@
+/home/brandon/SunnieClassroomAdventures/.devenv/flake.json
+/home/brandon/SunnieClassroomAdventures/.devenv.flake.nix
+/home/brandon/SunnieClassroomAdventures/.env
+/home/brandon/SunnieClassroomAdventures/devenv.local.nix
+/home/brandon/SunnieClassroomAdventures/devenv.lock
+/home/brandon/SunnieClassroomAdventures/devenv.nix
+/home/brandon/SunnieClassroomAdventures/devenv.yaml
