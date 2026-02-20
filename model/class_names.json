@@ -1,0 +1,50 @@
+{
+  "0": {
+    "name": "Alpha",
+    "symbol": "α"
+  },
+  "1": {
+    "name": "Beta",
+    "symbol": "β"
+  },
+  "2": {
+    "name": "Delta",
+    "symbol": "δ"
+  },
+  "3": {
+    "name": "Epsilon",
+    "symbol": "ε"
+  },
+  "4": {
+    "name": "Gamma",
+    "symbol": "γ"
+  },
+  "5": {
+    "name": "Lamda",
+    "symbol": "λ"
+  },
+  "6": {
+    "name": "Mu",
+    "symbol": "μ"
+  },
+  "7": {
+    "name": "Omega",
+    "symbol": "ω"
+  },
+  "8": {
+    "name": "Phi",
+    "symbol": "φ"
+  },
+  "9": {
+    "name": "Pi",
+    "symbol": "π"
+  },
+  "10": {
+    "name": "Sigma",
+    "symbol": "σ"
+  },
+  "11": {
+    "name": "Theta",
+    "symbol": "θ"
+  }
+}
