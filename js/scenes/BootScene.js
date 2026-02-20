@@ -29,9 +29,14 @@ class BootScene extends Phaser.Scene {
         gfx.generateTexture('particle', 16, 16);
         gfx.destroy();
 
-        // Slight delay for CDN fonts to load
+        // Start the next scene after a brief delay for CDN fonts to load.
+        // On index.html the next scene is TitleScene; on game.html it is GameScene.
+        const nextScene = this.scene.manager.keys.hasOwnProperty('TitleScene')
+            ? 'TitleScene'
+            : 'GameScene';
+
         this.time.delayedCall(200, () => {
-            this.scene.start('TitleScene');
+            this.scene.start(nextScene);
         });
     }
 }

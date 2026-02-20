@@ -18,24 +18,12 @@ class TitleScene extends Phaser.Scene {
     // ===== Lifecycle =====
 
     create() {
-        // Hide the drawing pane — not needed on the title screen.
-        // We must add the class first, then wait for the browser to reflow
-        // the layout (setTimeout 0 yields back to the event loop, allowing
-        // CSS to recalculate the container's dimensions).  Only THEN do we
-        // fire the resize event and build the scene so Phaser reads the
-        // correct full-width container size.
-        document.getElementById('app').classList.add('title-mode');
+        const w = this.scale.width;
+        const h = this.scale.height;
 
-        setTimeout(() => {
-            window.dispatchEvent(new Event('resize'));
-
-            const w = this.scale.width;
-            const h = this.scale.height;
-
-            this._buildBackground(w, h);
-            this._buildMinibus(w, h);
-            this._buildUI(w, h);
-        }, 0);
+        this._buildBackground(w, h);
+        this._buildMinibus(w, h);
+        this._buildUI(w, h);
     }
 
     update() {
@@ -168,7 +156,7 @@ class TitleScene extends Phaser.Scene {
         });
 
         btnBox.on('pointerdown', () => {
-            this.scene.start('GameScene');
+            window.location.href = 'game.html';
         });
     }
 }

@@ -9,15 +9,7 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        // ===== Layout Transition =====
-        // Remove title-mode so #drawing-area is no longer display:none in CSS.
-        // Also force the inline style immediately — this guarantees visibility
-        // even if CSS reflow hasn't completed yet, and ensures DrawingCanvas
-        // can read non-zero dimensions from getBoundingClientRect().
-        document.getElementById('app').classList.remove('title-mode');
-        document.getElementById('drawing-area').style.display = 'flex';
-
-        // ===== Synchronous State (needed by update() on first tick) =====
+        // ===== State =====
         this.clusters = [];
         this.score = 0;
         this.successfulPops = 0;
@@ -38,25 +30,15 @@ class GameScene extends Phaser.Scene {
             speedIncrease: GameConfig.SPEED_INCREASE,
         });
 
-        // ===== Deferred Visual Setup =====
-        // requestAnimationFrame fires after the browser has recalculated
-        // layout, so the game-container is already at its 65% width.
-        // Resizing Phaser here avoids the canvas being sized to the old
-        // full-width title-mode container and overflowing the drawing area.
-        requestAnimationFrame(() => {
-            const container = document.getElementById('game-container');
-            this.sys.game.scale.resize(container.clientWidth, container.clientHeight);
+        // ===== Visuals =====
+        this._createBackgroundStars();
+        this._createHUD();
 
-            this._createBackgroundStars();
-            this._createHUD();
+        // ===== Drawing Canvas =====
+        this.drawingCanvas = new DrawingCanvas('draw-canvas', 'submit-btn');
+        this.drawingCanvas.onRecognized = (result) => this._onLetterRecognized(result);
 
-            // DrawingCanvas reads getBoundingClientRect() in its constructor.
-            // Deferring until here guarantees #drawing-area has non-zero size.
-            this.drawingCanvas = new DrawingCanvas('draw-canvas', 'submit-btn');
-            this.drawingCanvas.onRecognized = (result) => this._onLetterRecognized(result);
-
-            this.spawner.start();
-        });
+        this.spawner.start();
     }
 
     _createBackgroundStars() {

@@ -29,11 +29,30 @@
 </head>
 
 <body>
-    <div id="game-container"></div>
+    <div id="app">
+        <div id="game-container"></div>
+        <div id="drawing-area">
+            <div id="drawing-header">
+                <span class="drawing-title">Copy the Numbers!</span>
+            </div>
+            <canvas id="draw-canvas"></canvas>
+            <div id="drawing-controls">
+                <button id="submit-btn" type="button">Submit</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
+    <script src="js/recognition/digitCNN.js"></script>
+    <script src="js/drawing/DrawingCanvas.js"></script>
+    <script src="js/systems/LifeSystem.js"></script>
+    <script src="js/systems/Spawner.js"></script>
+    <script src="js/entities/Balloon.js"></script>
+    <script src="js/entities/StarCluster.js"></script>
     <script src="js/scenes/BootScene.js"></script>
-    <script src="js/scenes/TitleScene.js"></script>
+    <script src="js/scenes/GameScene.js"></script>
+    <script src="js/scenes/GameOverScene.js"></script>
     <script src="js/game.js"></script>
 </body>
 
