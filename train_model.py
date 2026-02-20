@@ -50,8 +50,13 @@ class FilteredImageFolder(datasets.ImageFolder):
         valid_classes = set(target_classes.keys())
         valid_indices = {self.class_to_idx[c] for c in valid_classes if c in self.class_to_idx}
 
-        # Filter samples
-        self.samples = [(path, idx) for path, idx in self.samples if idx in valid_indices]
+        # Filter samples to only target classes and exclude rotated images
+        filtered_samples = []
+        for path, idx in self.samples:
+            if idx in valid_indices and not os.path.basename(path).startswith('_'):
+                filtered_samples.append((path, idx))
+                
+        self.samples = filtered_samples
         self.targets = [idx for _, idx in self.samples]
         self.imgs = self.samples
 

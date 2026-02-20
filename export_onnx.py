@@ -67,6 +67,16 @@ if __name__ == '__main__':
     # Verify
     import onnx
     onnx_model = onnx.load(onnx_path)
+    
+    # Force embed external data into the ONNX file
+    onnx.save_model(onnx_model, onnx_path, save_as_external_data=False)
+    
+    onnx_model = onnx.load(onnx_path)
     onnx.checker.check_model(onnx_model)
+    
+    # Clean up the external data file if torch created it
+    if os.path.exists(onnx_path + ".data"):
+        os.remove(onnx_path + ".data")
+        
     print(f"✅ ONNX model exported and verified: {onnx_path}")
     print(f"   Size: {os.path.getsize(onnx_path) / 1024:.1f} KB")
