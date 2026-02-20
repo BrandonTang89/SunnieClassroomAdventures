@@ -1,0 +1,5 @@
+greekDataset/
+venv/
+model/
+__pycache__/
+img\references\

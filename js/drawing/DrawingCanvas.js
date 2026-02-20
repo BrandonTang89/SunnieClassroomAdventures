@@ -1,24 +1,24 @@
 /**
  * DrawingCanvas — Manages the HTML5 Canvas drawing surface for Greek letter input.
  * Supports mouse, touch, and stylus (Apple Pencil).
- * Collects stroke points for $P recognizer and dispatches recognition events.
+ * Uses GreekCNN (ONNX Runtime Web) for recognition.
  */
 
 class DrawingCanvas {
-    constructor(canvasId, submitBtnId, clearBtnId) {
+    constructor(canvasId, submitBtnId) {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
         this.submitBtn = document.getElementById(submitBtnId);
-        this.clearBtn = document.getElementById(clearBtnId);
 
-        this.points = [];        // Array of PDollarPoint
+        this.points = [];        // For redraw only
         this.strokeId = 0;
         this.isDrawing = false;
         this.lastX = 0;
         this.lastY = 0;
 
-        this.recognizer = new PDollarRecognizer();
-        initGreekTemplates(this.recognizer);
+        // CNN recognizer (loaded asynchronously)
+        this.recognizer = new GreekCNN();
+        this.recognizer.init();
 
         this.onRecognized = null; // callback: (result) => {}
 
@@ -56,7 +56,6 @@ class DrawingCanvas {
 
         // Buttons
         this.submitBtn.addEventListener('click', () => this._submit());
-        this.clearBtn.addEventListener('click', () => this.clear());
 
         // Resize
         window.addEventListener('resize', () => {
@@ -80,7 +79,7 @@ class DrawingCanvas {
         const pos = this._getPos(e);
         this.lastX = pos.x;
         this.lastY = pos.y;
-        this.points.push(new PDollarPoint(pos.x, pos.y, this.strokeId));
+        this.points.push({ x: pos.x, y: pos.y, id: this.strokeId });
         this.canvas.classList.add('drawing');
     }
 
@@ -97,7 +96,7 @@ class DrawingCanvas {
 
         this.lastX = pos.x;
         this.lastY = pos.y;
-        this.points.push(new PDollarPoint(pos.x, pos.y, this.strokeId));
+        this.points.push({ x: pos.x, y: pos.y, id: this.strokeId });
     }
 
     _onPointerUp(e) {
@@ -114,36 +113,45 @@ class DrawingCanvas {
         if (this.points.length < 2) return;
 
         for (let i = 1; i < this.points.length; i++) {
-            if (this.points[i].ID === this.points[i - 1].ID) {
+            if (this.points[i].id === this.points[i - 1].id) {
                 this.ctx.beginPath();
-                this.ctx.moveTo(this.points[i - 1].X, this.points[i - 1].Y);
-                this.ctx.lineTo(this.points[i].X, this.points[i].Y);
+                this.ctx.moveTo(this.points[i - 1].x, this.points[i - 1].y);
+                this.ctx.lineTo(this.points[i].x, this.points[i].y);
                 this.ctx.stroke();
             }
         }
     }
 
-    _submit() {
-        console.log('[DrawingCanvas] Submit clicked, points:', this.points.length);
+    async _submit() {
         if (this.points.length < 5) {
             this._flashFeedback('Draw a letter first!', '#f87171');
             return;
         }
 
-        const result = this.recognizer.Recognize(this.points);
-        console.log('[DrawingCanvas] Recognition result:', result.Name, 'Score:', result.Score);
+        if (!this.recognizer.ready) {
+            this._flashFeedback('Model loading...', '#fbbf24');
+            return;
+        }
+
+        // Run CNN inference on the canvas
+        const result = await this.recognizer.recognize(this.canvas);
+        console.log('[DrawingCanvas] Recognition result:', result.symbol,
+            'Confidence:', (result.confidence * 100).toFixed(1) + '%');
 
         if (this.onRecognized) {
             this.onRecognized(result);
         }
 
-        this._flashFeedback(`Recognized: ${result.Name}`, result.Score > 0 ? '#34d399' : '#f87171');
+        const confPct = (result.confidence * 100).toFixed(0);
+        this._flashFeedback(
+            `${result.symbol} (${confPct}%)`,
+            result.confidence > 0.3 ? '#34d399' : '#f87171'
+        );
         this.clear();
     }
 
     _flashFeedback(text, color) {
         const header = document.querySelector('.drawing-title');
-        const original = header.textContent;
         header.textContent = text;
         header.style.background = 'none';
         header.style.webkitBackgroundClip = 'unset';

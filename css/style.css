@@ -1,11 +1,14 @@
 /* ===== RESET & BASE ===== */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -97,21 +100,6 @@ html, body {
     letter-spacing: 0.5px;
 }
 
-#clear-btn {
-    background: linear-gradient(135deg, #374151, #4b5563);
-    color: #d1d5db;
-    border: 1px solid rgba(156, 163, 175, 0.2) !important;
-}
-
-#clear-btn:hover {
-    background: linear-gradient(135deg, #4b5563, #6b7280);
-    transform: translateY(-1px);
-}
-
-#clear-btn:active {
-    transform: translateY(1px);
-}
-
 #submit-btn {
     background: linear-gradient(135deg, #7c3aed, #6366f1, #4f46e5);
     color: #fff;
@@ -139,9 +127,11 @@ html, body {
     #app {
         flex-direction: column;
     }
+
     #game-container {
         flex: 0 0 55%;
     }
+
     #drawing-area {
         flex: 0 0 45%;
         border-left: none;
@@ -151,8 +141,15 @@ html, body {
 
 /* ===== ANIMATIONS ===== */
 @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.1); }
-    50% { box-shadow: 0 0 35px rgba(139, 92, 246, 0.25); }
+
+    0%,
+    100% {
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
+    }
+
+    50% {
+        box-shadow: 0 0 35px rgba(139, 92, 246, 0.25);
+    }
 }
 
 #draw-canvas:focus,

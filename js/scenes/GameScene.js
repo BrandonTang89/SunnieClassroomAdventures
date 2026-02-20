@@ -37,7 +37,7 @@ class GameScene extends Phaser.Scene {
         this._createHUD();
 
         // ===== Drawing Canvas Integration =====
-        this.drawingCanvas = new DrawingCanvas('draw-canvas', 'submit-btn', 'clear-btn');
+        this.drawingCanvas = new DrawingCanvas('draw-canvas', 'submit-btn');
         this.drawingCanvas.onRecognized = (result) => this._onLetterRecognized(result);
 
         // ===== Start =====
@@ -119,8 +119,15 @@ class GameScene extends Phaser.Scene {
 
     _onLetterRecognized(result) {
         const letter = result.Name;
-        console.log('[GameScene] Letter recognized:', letter, 'Score:', result.Score);
-        if (letter === 'No match') return;
+        const confidence = result.Score || result.confidence || 0;
+        console.log('[GameScene] Letter recognized:', letter, 'Confidence:', (confidence * 100).toFixed(1) + '%');
+        if (letter === 'No match' || letter === '?') return;
+
+        // Confidence threshold — ignore low-confidence predictions
+        if (confidence < 0.3) {
+            console.log('[GameScene] Confidence too low, ignoring');
+            return;
+        }
 
         // Log available letters on screen
         const available = this.clusters

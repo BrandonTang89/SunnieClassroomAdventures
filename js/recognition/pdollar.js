@@ -47,21 +47,48 @@ class PDollarRecognizer {
         if (points.length === 0) return new PDollarResult('No match', 0);
 
         const candidate = new PointCloud('candidate', points);
-        let bestDistance = Infinity;
-        let bestIndex = -1;
 
+        // Compute distance to all templates
+        const results = [];
         for (let i = 0; i < this.PointClouds.length; i++) {
             const d = PDollarRecognizer.GreedyCloudMatch(candidate.Points, this.PointClouds[i].Points);
-            if (d < bestDistance) {
-                bestDistance = d;
-                bestIndex = i;
-            }
+            results.push({ index: i, name: this.PointClouds[i].Name, distance: d });
         }
 
-        if (bestIndex === -1) return new PDollarResult('No match', 0);
+        // Sort by distance (ascending = best first)
+        results.sort((a, b) => a.distance - b.distance);
 
-        const score = Math.max((bestDistance - 2.0) / -2.0, 0);
-        return new PDollarResult(this.PointClouds[bestIndex].Name, score);
+        if (results.length === 0) return new PDollarResult('No match', 0);
+
+        // Get the best match per unique letter (best distance per letter)
+        const bestPerLetter = new Map();
+        for (const r of results) {
+            if (!bestPerLetter.has(r.name)) {
+                bestPerLetter.set(r.name, r);
+            }
+        }
+        const uniqueResults = Array.from(bestPerLetter.values()).sort((a, b) => a.distance - b.distance);
+
+        // Log top 3 for debugging
+        const top3 = uniqueResults.slice(0, 3).map(r => `${r.name}(${r.distance.toFixed(3)})`).join(', ');
+        console.log('[Recognizer] Top 3:', top3);
+
+        const best = uniqueResults[0];
+
+        // Score: use normalized distance. Lower distance = better match.
+        // Also compute ratio to second best for confidence
+        let score = Math.max(0, 1.0 - best.distance * 0.5);
+
+        if (uniqueResults.length > 1) {
+            const secondBest = uniqueResults[1];
+            const ratio = best.distance / secondBest.distance;
+            // If the best is much closer than second best, boost confidence
+            // ratio near 0 = very confident, ratio near 1 = ambiguous
+            console.log('[Recognizer] Best/2nd ratio:', ratio.toFixed(3),
+                `(${best.name} vs ${secondBest.name})`);
+        }
+
+        return new PDollarResult(best.name, score);
     }
 
     static GreedyCloudMatch(points1, points2) {
