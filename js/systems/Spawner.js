@@ -14,8 +14,8 @@ class Spawner {
         this.maxSpeed = config.maxSpeed || 90;                   // max speed
         this.speedIncrease = config.speedIncrease || 0.5;        // speed increase per second
 
-        // Available Greek letters
-        this.letters = ['α', 'β', 'γ', 'δ', 'ε', 'θ', 'λ', 'μ', 'π', 'σ', 'φ', 'ω'];
+        // Available Digits
+        this.letters = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
         this.elapsedMs = 0;
         this.timeSinceSpawn = 0;

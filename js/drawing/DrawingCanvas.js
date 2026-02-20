@@ -17,7 +17,7 @@ class DrawingCanvas {
         this.lastY = 0;
 
         // CNN recognizer (loaded asynchronously)
-        this.recognizer = new GreekCNN();
+        this.recognizer = new DigitCNN();
         this.recognizer.init();
 
         this.onRecognized = null; // callback: (result) => {}
@@ -36,12 +36,12 @@ class DrawingCanvas {
     }
 
     _applyStyle() {
-        this.ctx.strokeStyle = '#a78bfa';
-        this.ctx.lineWidth = 4;
+        this.ctx.strokeStyle = '#f8f9fa'; // Chalk white
+        this.ctx.lineWidth = 10;
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
-        this.ctx.shadowColor = '#8b5cf6';
-        this.ctx.shadowBlur = 8;
+        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
+        this.ctx.shadowBlur = 4;
     }
 
     _setupEvents() {
@@ -153,17 +153,11 @@ class DrawingCanvas {
     _flashFeedback(text, color) {
         const header = document.querySelector('.drawing-title');
         header.textContent = text;
-        header.style.background = 'none';
-        header.style.webkitBackgroundClip = 'unset';
-        header.style.webkitTextFillColor = color;
-        header.style.backgroundClip = 'unset';
+        header.style.color = color;
 
         setTimeout(() => {
-            header.textContent = 'Draw the Letter';
-            header.style.background = 'linear-gradient(135deg, #a78bfa, #818cf8, #60a5fa)';
-            header.style.webkitBackgroundClip = 'text';
-            header.style.webkitTextFillColor = 'transparent';
-            header.style.backgroundClip = 'text';
+            header.textContent = 'Copy the Numbers!';
+            header.style.color = '#4a3b32';
         }, 1200);
     }
 

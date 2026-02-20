@@ -11,6 +11,7 @@ class GameScene extends Phaser.Scene {
     create() {
         this.clusters = [];
         this.score = 0;
+        this.successfulPops = 0; // Track successful draws for Sunnie poses
 
         // ===== Background Stars (ambient) =====
         this._createBackgroundStars();
@@ -45,9 +46,34 @@ class GameScene extends Phaser.Scene {
     }
 
     _createBackgroundStars() {
-        const gfx = this.add.graphics();
         const w = this.scale.width;
         const h = this.scale.height;
+
+        // Render background classroom image
+        const bg = this.add.image(w / 2, h / 2, 'classroom_bg');
+        // Cover the whole screen
+        const scaleX = w / bg.width;
+        const scaleY = h / bg.height;
+        bg.setScale(Math.max(scaleX, scaleY));
+        bg.setDepth(-10); // Far back
+
+        // Render Sunnie character on the BOTTOM LEFT
+        this.sunnie = this.add.image(w * 0.15, h - 150, 'sunnie_1');
+        this.sunnie.setScale(0.7); // Scale appropriately
+        this.sunnie.setDepth(-5); // In front of background, behind balloons (which default to 0-1)
+
+        // Fun idle bobbing animation for Sunnie
+        this.tweens.add({
+            targets: this.sunnie,
+            y: this.sunnie.y - 15,
+            duration: 900,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
+
+        // Ambient interactive stars overlay
+        const gfx = this.add.graphics();
 
         for (let i = 0; i < 60; i++) {
             const x = Phaser.Math.Between(0, w);
@@ -145,11 +171,33 @@ class GameScene extends Phaser.Scene {
         }
 
         if (totalPopped > 0) {
+            this.successfulPops++;
+            this._updateSunniePose();
+
             // Flash effect on the score
             this.tweens.add({
                 targets: this.scoreText,
                 scaleX: 1.3,
                 scaleY: 1.3,
+                duration: 150,
+                yoyo: true,
+                ease: 'Back.easeOut'
+            });
+        }
+    }
+
+    _updateSunniePose() {
+        // Change pose every 5 successful draws
+        // Max pose index is 5, loop back if needed
+        const poseIndex = Math.floor(this.successfulPops / 5) % 5 + 1;
+        this.sunnie.setTexture(`sunnie_${poseIndex}`);
+
+        // Add a fun little pop animation when she changes poses
+        if (this.successfulPops % 5 === 0) {
+            this.tweens.add({
+                targets: this.sunnie,
+                scaleX: 0.85,
+                scaleY: 0.85,
                 duration: 150,
                 yoyo: true,
                 ease: 'Back.easeOut'

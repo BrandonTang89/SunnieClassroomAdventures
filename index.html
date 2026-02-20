@@ -6,11 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Sunnie's Classroom Adventures — Greek Letter Balloon Pop</title>
-    <meta name="description"
-        content="Pop balloons by drawing Greek letters! An educational HTML5 game designed for iPad.">
+    <title>Sunnie's Classroom Adventures — Digit Balloon Pop</title>
+    <meta name="description" content="Pop balloons by drawing digits! An educational HTML5 game designed for iPad.">
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        // Prevent double-tap to zoom on Safari iOS 10+
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            let now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, { passive: false });
+
+        // Prevent pinch-to-zoom on Safari iOS
+        document.addEventListener('gesturestart', function (event) {
+            event.preventDefault();
+        });
+    </script>
 </head>
 
 <body>
@@ -18,18 +33,18 @@
         <div id="game-container"></div>
         <div id="drawing-area">
             <div id="drawing-header">
-                <span class="drawing-title">Draw the Letter</span>
+                <span class="drawing-title">Copy the Numbers!</span>
             </div>
             <canvas id="draw-canvas"></canvas>
             <div id="drawing-controls">
-                <button id="submit-btn" type="button">Submit ✨</button>
+                <button id="submit-btn" type="button">Submit</button>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
-    <script src="js/recognition/greekCNN.js"></script>
+    <script src="js/recognition/digitCNN.js"></script>
     <script src="js/drawing/DrawingCanvas.js"></script>
     <script src="js/systems/LifeSystem.js"></script>
     <script src="js/systems/Spawner.js"></script>

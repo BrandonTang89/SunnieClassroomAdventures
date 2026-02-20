@@ -23,7 +23,8 @@ class Balloon {
         this.letter = letter;
         this.popped = false;
 
-        const color = Balloon.COLORS[Phaser.Math.Between(0, Balloon.COLORS.length - 1)];
+        const digit = parseInt(letter, 10);
+        const color = isNaN(digit) ? Balloon.COLORS[0] : Balloon.COLORS[digit % Balloon.COLORS.length];
 
         // Create balloon container
         this.container = scene.add.container(x, y);

@@ -7,6 +7,13 @@ class BootScene extends Phaser.Scene {
         super({ key: 'BootScene' });
     }
 
+    preload() {
+        this.load.image('classroom_bg', 'img/classroom_bg.png');
+        for (let i = 1; i <= 5; i++) {
+            this.load.image(`sunnie_${i}`, `img/sunnie_pose_${i}.png`);
+        }
+    }
+
     create() {
         // Generate a small white circle texture for particles
         const gfx = this.add.graphics();

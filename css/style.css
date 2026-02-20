@@ -5,6 +5,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 html,
@@ -46,10 +47,11 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
-    background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
-    border-left: 2px solid rgba(99, 102, 241, 0.3);
-    padding: 12px;
-    gap: 10px;
+    /* Soft classroom wall color */
+    background: #e2dac9;
+    border-left: 2px solid #bba37f;
+    padding: 16px;
+    gap: 12px;
 }
 
 #drawing-header {
@@ -58,24 +60,24 @@ body {
 }
 
 .drawing-title {
-    font-size: 1.3rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #a78bfa, #818cf8, #60a5fa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #4a3b32;
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
     letter-spacing: 0.5px;
 }
 
 #draw-canvas {
     flex: 1;
     width: 100%;
-    border-radius: 16px;
-    background: radial-gradient(ellipse at center, #1e1e3a 0%, #151528 100%);
-    border: 2px solid rgba(139, 92, 246, 0.25);
+    border-radius: 6px;
+    background: #2b4234;
+    /* Chalkboard Green */
+    border: 12px solid #6b4c3a;
+    /* Wood frame */
     box-shadow:
-        0 0 20px rgba(139, 92, 246, 0.1),
-        inset 0 0 30px rgba(0, 0, 0, 0.3);
+        inset 0 0 40px rgba(0, 0, 0, 0.6),
+        0 6px 12px rgba(0, 0, 0, 0.15);
     cursor: crosshair;
     touch-action: none;
 }
@@ -101,25 +103,25 @@ body {
 }
 
 #submit-btn {
-    background: linear-gradient(135deg, #7c3aed, #6366f1, #4f46e5);
-    color: #fff;
-    box-shadow:
-        0 4px 15px rgba(99, 102, 241, 0.4),
-        0 0 30px rgba(139, 92, 246, 0.15);
-    border: 1px solid rgba(167, 139, 250, 0.3) !important;
+    background: #fdfbf7;
+    color: #4a3b32;
+    box-shadow: 0 6px 0px #bba37f;
+    border: 2px solid #bba37f !important;
+    text-transform: uppercase;
+    font-weight: 800;
+    margin-bottom: 6px;
+    /* Space for the 3D push effect */
 }
 
 #submit-btn:hover {
-    background: linear-gradient(135deg, #8b5cf6, #818cf8, #6366f1);
-    box-shadow:
-        0 6px 25px rgba(99, 102, 241, 0.5),
-        0 0 40px rgba(139, 92, 246, 0.25);
-    transform: translateY(-2px);
+    background: #ffffff;
+    box-shadow: 0 6px 0px #ab926e;
+    transform: translateY(-1px);
 }
 
 #submit-btn:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+    transform: translateY(4px);
+    box-shadow: 0 2px 0px #ab926e;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -135,7 +137,7 @@ body {
     #drawing-area {
         flex: 0 0 45%;
         border-left: none;
-        border-top: 2px solid rgba(99, 102, 241, 0.3);
+        border-top: 4px solid #bba37f;
     }
 }
 
@@ -144,16 +146,16 @@ body {
 
     0%,
     100% {
-        box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
+        box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
     }
 
     50% {
-        box-shadow: 0 0 35px rgba(139, 92, 246, 0.25);
+        box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 200, 0.2);
     }
 }
 
 #draw-canvas:focus,
 #draw-canvas.drawing {
     animation: pulse-glow 2s ease-in-out infinite;
-    border-color: rgba(139, 92, 246, 0.5);
+    border-color: #7b5944;
 }
