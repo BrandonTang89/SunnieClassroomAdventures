@@ -175,10 +175,31 @@ class GameOverScene extends Phaser.Scene {
             domBtn.style.transform = 'scale(1.05)';
         }, { passive: true });
 
-        // Navigate on click/tap
-        domBtn.addEventListener('click', () => {
+        // Stylus feedback (Apple Pencil — doesn't fire touch events)
+        domBtn.addEventListener('pointerdown', (e) => {
+            if (e.pointerType === 'pen') {
+                domBtn.style.background = '#a56e3a';
+                domBtn.style.transform = 'scale(1.05)';
+            }
+        }, { passive: true });
+
+        // Reset stylus feedback on release/cancel
+        const resetBtnStyle = () => {
+            domBtn.style.background = '#8b5a2b';
+            domBtn.style.transform = 'scale(1)';
+        };
+        domBtn.addEventListener('pointerup', resetBtnStyle, { passive: true });
+        domBtn.addEventListener('pointercancel', resetBtnStyle, { passive: true });
+
+        // Navigate on click/tap/stylus — guard against double navigation
+        let navigating = false;
+        const navigate = () => {
+            if (navigating) return;
+            navigating = true;
             window.location.href = 'index.html';
-        });
+        };
+        domBtn.addEventListener('click', navigate);
+        domBtn.addEventListener('pointerup', navigate);
 
         // Reposition on resize
         this._resizeHandler = () => positionBtn();
