@@ -118,6 +118,8 @@ body {
     font-weight: 800;
     margin-bottom: 6px;
     /* Space for the 3D push effect */
+    touch-action: manipulation;
+    /* Disable double-tap-to-zoom delay for all input types (finger + stylus) */
 }
 
 #submit-btn:hover {

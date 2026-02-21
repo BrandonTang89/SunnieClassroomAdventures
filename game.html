@@ -28,6 +28,22 @@
             lastTouchEnd = now;
         }, { passive: false });
 
+        // Also prevent double-tap zoom via pointer events (covers Apple Pencil/stylus,
+        // which generates pointer events but NOT touch events)
+        let lastPointerUp = 0;
+        document.addEventListener('pointerup', function (event) {
+            const target = event.target;
+            if (target && (target.id === 'submit-btn' || target.closest('#submit-btn') ||
+                target.id === 'play-again-btn' || target.closest('#play-again-btn'))) {
+                return; // Don't block rapid stylus taps on submit or play again
+            }
+            let now = (new Date()).getTime();
+            if (now - lastPointerUp <= 300) {
+                event.preventDefault();
+            }
+            lastPointerUp = now;
+        }, { passive: false });
+
         // Prevent pinch-to-zoom on Safari iOS
         document.addEventListener('gesturestart', function (event) {
             event.preventDefault();

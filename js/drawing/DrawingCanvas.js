@@ -55,13 +55,20 @@ class DrawingCanvas {
         // Prevent context menu on long press
         this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
-        // Submit: use both click (desktop) and touchend (iPad/mobile) for responsiveness
+        // Submit: use pointerup (handles mouse, touch, AND Apple Pencil/stylus),
+        // plus touchend as a fallback for older browsers.
+        // Apple Pencil generates pointer events but NOT touch events, so
+        // relying on touchend alone misses stylus input on iPad.
+        this.submitBtn.addEventListener('pointerup', (e) => {
+            e.preventDefault();
+            this._submit();
+        });
+
         this.submitBtn.addEventListener('click', (e) => {
             e.preventDefault();
             this._submit();
         });
 
-        // On touch devices, fire submit immediately on touchend to bypass iOS click delay
         this.submitBtn.addEventListener('touchend', (e) => {
             e.preventDefault();
             this._submit();
