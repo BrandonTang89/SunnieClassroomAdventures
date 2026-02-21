@@ -29,12 +29,12 @@ class GameOverScene extends Phaser.Scene {
         this.rainParticles = this.add.particles(0, 0, 'particle', {
             x: { min: 0, max: w },
             y: -50,
-            speedY: { min: 500, max: 900 },
+            speedY: { min: 700, max: 1100 },
             speedX: { min: -50, max: 50 },
             scale: { start: 0.1, end: 0.3 },
-            alpha: { start: 0.4, end: 0.0 },
+            alpha: { start: 0.5, end: 0.0 },
             lifespan: 1500,
-            quantity: 3,
+            quantity: 15,
             tint: [0xa78bfa, 0x66ccff, 0xffffff],
             blendMode: 'ADD'
         });
