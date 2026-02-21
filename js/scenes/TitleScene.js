@@ -147,34 +147,35 @@ class TitleScene extends Phaser.Scene {
             strokeThickness: 6,
         }).setOrigin(0.5);
 
-        // Left Arrow
-        const leftArrow = this.add.text(w / 2 - 160, diffY, '◀', {
-            fontFamily: 'sans-serif',
-            fontSize: '36px',
-            color: '#fdfbf7',
-            stroke: '#4a3b32',
-            strokeThickness: 6,
-        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        // Left Arrow (drawn triangle – avoids blue emoji on iPad Safari)
+        const arrowSize = 18;
+        const leftArrowGfx = this.add.graphics({ x: w / 2 - 160, y: diffY });
+        leftArrowGfx.fillStyle(0xfdfbf7, 1);
+        leftArrowGfx.lineStyle(3, 0x4a3b32, 1);
+        leftArrowGfx.fillTriangle(arrowSize, -arrowSize, -arrowSize, 0, arrowSize, arrowSize);
+        leftArrowGfx.strokeTriangle(arrowSize, -arrowSize, -arrowSize, 0, arrowSize, arrowSize);
+        const leftArrow = this.add.zone(w / 2 - 160, diffY, arrowSize * 3, arrowSize * 3)
+            .setInteractive({ useHandCursor: true });
 
         leftArrow.on('pointerdown', () => {
             this.diffIndex = (this.diffIndex - 1 + this.difficulties.length) % this.difficulties.length;
             this._updateDifficultyDisplay();
-            this.tweens.add({ targets: leftArrow, scaleX: 1.3, scaleY: 1.3, duration: 100, yoyo: true });
+            this.tweens.add({ targets: leftArrowGfx, scaleX: 1.3, scaleY: 1.3, duration: 100, yoyo: true });
         });
 
-        // Right Arrow
-        const rightArrow = this.add.text(w / 2 + 160, diffY, '▶', {
-            fontFamily: 'sans-serif',
-            fontSize: '36px',
-            color: '#fdfbf7',
-            stroke: '#4a3b32',
-            strokeThickness: 6,
-        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        // Right Arrow (drawn triangle – avoids blue emoji on iPad Safari)
+        const rightArrowGfx = this.add.graphics({ x: w / 2 + 160, y: diffY });
+        rightArrowGfx.fillStyle(0xfdfbf7, 1);
+        rightArrowGfx.lineStyle(3, 0x4a3b32, 1);
+        rightArrowGfx.fillTriangle(-arrowSize, -arrowSize, arrowSize, 0, -arrowSize, arrowSize);
+        rightArrowGfx.strokeTriangle(-arrowSize, -arrowSize, arrowSize, 0, -arrowSize, arrowSize);
+        const rightArrow = this.add.zone(w / 2 + 160, diffY, arrowSize * 3, arrowSize * 3)
+            .setInteractive({ useHandCursor: true });
 
         rightArrow.on('pointerdown', () => {
             this.diffIndex = (this.diffIndex + 1) % this.difficulties.length;
             this._updateDifficultyDisplay();
-            this.tweens.add({ targets: rightArrow, scaleX: 1.3, scaleY: 1.3, duration: 100, yoyo: true });
+            this.tweens.add({ targets: rightArrowGfx, scaleX: 1.3, scaleY: 1.3, duration: 100, yoyo: true });
         });
 
         // ---- PLAY button ----
