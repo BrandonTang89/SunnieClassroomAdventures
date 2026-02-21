@@ -13,8 +13,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script>
         // Prevent double-tap to zoom on Safari iOS 10+
+        // But exclude the submit button so rapid taps still fire
         let lastTouchEnd = 0;
         document.addEventListener('touchend', function (event) {
+            const target = event.target;
+            if (target && (target.id === 'submit-btn' || target.closest('#submit-btn'))) {
+                return; // Don't block rapid taps on submit
+            }
             let now = (new Date()).getTime();
             if (now - lastTouchEnd <= 300) {
                 event.preventDefault();

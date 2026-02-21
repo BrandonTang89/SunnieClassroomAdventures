@@ -15,6 +15,7 @@ class DrawingCanvas {
         this.isDrawing = false;
         this.lastX = 0;
         this.lastY = 0;
+        this._submitting = false; // Guard against concurrent submissions
 
         // CNN recognizer (loaded asynchronously)
         this.recognizer = new DigitCNN();
@@ -54,8 +55,17 @@ class DrawingCanvas {
         // Prevent context menu on long press
         this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
-        // Buttons
-        this.submitBtn.addEventListener('click', () => this._submit());
+        // Submit: use both click (desktop) and touchend (iPad/mobile) for responsiveness
+        this.submitBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this._submit();
+        });
+
+        // On touch devices, fire submit immediately on touchend to bypass iOS click delay
+        this.submitBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this._submit();
+        });
 
         // Resize
         window.addEventListener('resize', () => {
@@ -123,6 +133,11 @@ class DrawingCanvas {
     }
 
     async _submit() {
+        // Debounce guard: prevent touchend + click from double-firing on same tap
+        const now = Date.now();
+        if (now - (this._lastSubmitTime || 0) < 100) return;
+        this._lastSubmitTime = now;
+
         if (this.points.length < 5) {
             this._flashFeedback('Draw a digit first!', '#f87171');
             return;
@@ -134,7 +149,12 @@ class DrawingCanvas {
         }
 
         // Run CNN inference on the canvas
-        const result = await this.recognizer.recognize(this.canvas);
+        // Clear immediately so the user can start drawing the next number
+        const recognizePromise = this.recognizer.recognize(this.canvas);
+
+        this.clear();
+
+        const result = await recognizePromise;
         console.log('[DrawingCanvas] Recognition result:', result.symbol,
             'Confidence:', (result.confidence * 100).toFixed(1) + '%');
 
@@ -147,7 +167,6 @@ class DrawingCanvas {
             `${result.symbol} (${confPct}%)`,
             result.confidence > 0.3 ? '#34d399' : '#f87171'
         );
-        this.clear();
     }
 
     _flashFeedback(text, color) {
@@ -155,7 +174,11 @@ class DrawingCanvas {
         header.textContent = text;
         header.style.color = color;
 
-        setTimeout(() => {
+        if (this.feedbackTimeout) {
+            clearTimeout(this.feedbackTimeout);
+        }
+
+        this.feedbackTimeout = setTimeout(() => {
             header.textContent = 'Copy the Numbers!';
             header.style.color = '#4a3b32';
         }, 1200);

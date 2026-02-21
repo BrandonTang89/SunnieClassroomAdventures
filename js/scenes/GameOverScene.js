@@ -115,18 +115,19 @@ class GameOverScene extends Phaser.Scene {
             });
         });
 
-        // Play Again button
-        const btnBg = this.add.rectangle(w / 2, h * 0.75, 260, 65, 0x8b5a2b, 1) // Brown
+        // Play Again button — larger hit area for iPad touch targets
+        const btnBg = this.add.rectangle(w / 2, h * 0.75, 300, 80, 0x8b5a2b, 1) // Brown
             .setStrokeStyle(4, 0x4a3b32)
             .setInteractive({ useHandCursor: true })
-            .setAlpha(0);
+            .setAlpha(0)
+            .setDepth(100);
 
         const btnText = this.add.text(w / 2, h * 0.75, 'Play Again ✨', {
             fontFamily: 'Outfit',
             fontSize: '22px',
             fontStyle: '700',
             color: '#ffffff',
-        }).setOrigin(0.5).setAlpha(0);
+        }).setOrigin(0.5).setAlpha(0).setDepth(101);
 
         this.tweens.add({
             targets: [btnBg, btnText],
@@ -148,8 +149,9 @@ class GameOverScene extends Phaser.Scene {
             btnText.setScale(1);
         });
 
-        btnBg.on('pointerdown', () => {
-            this.scene.start('GameScene');
+        // Use pointerup for better iOS/iPad compatibility
+        btnBg.on('pointerup', () => {
+            window.location.href = 'index.html';
         });
     }
 }
