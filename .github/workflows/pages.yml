@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Clean up unused files
+        run: rm -rf data .venv adhoc_scripts pyproject.toml uv.lock *.py
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

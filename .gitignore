@@ -1,3 +1,6 @@
 greekDataset/
 __pycache__/
 img/references/
+.devenv/
+data/
+.venv/
