@@ -26,6 +26,9 @@ class Balloon {
         const digit = parseInt(letter, 10);
         const color = isNaN(digit) ? Balloon.COLORS[0] : Balloon.COLORS[digit % Balloon.COLORS.length];
 
+        // Track the "home" x position for sway
+        this.baseX = x;
+
         // Create balloon container
         this.container = scene.add.container(x, y);
 
@@ -52,12 +55,43 @@ class Balloon {
         this.container.add([this.body, this.shine, this.knot, this.text]);
 
         // Gentle sway animation
-        const swayDuration = Phaser.Math.Between(1500, 2500);
-        const swayAmount = Phaser.Math.Between(3, 8);
-        scene.tweens.add({
+        this.swayDuration = Phaser.Math.Between(1500, 2500);
+        this.swayAmount = Phaser.Math.Between(3, 8);
+        this.swayTween = scene.tweens.add({
             targets: this.container,
-            x: { value: x + swayAmount, duration: swayDuration, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' },
-            rotation: { value: Phaser.Math.DegToRad(Phaser.Math.Between(-5, 5)), duration: swayDuration * 1.3, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' }
+            x: { value: x + this.swayAmount, duration: this.swayDuration, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' },
+            rotation: { value: Phaser.Math.DegToRad(Phaser.Math.Between(-5, 5)), duration: this.swayDuration * 1.3, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' }
+        });
+    }
+
+    /**
+     * Smoothly re-center this balloon to a new x position.
+     * Stops the old sway, tweens to the new x, then starts sway around it.
+     */
+    reCenter(newX) {
+        if (this.popped) return;
+        this.baseX = newX;
+
+        // Stop the current sway tween
+        if (this.swayTween) {
+            this.swayTween.stop();
+            this.swayTween = null;
+        }
+
+        // Smoothly glide to the new x, then restart sway
+        this.scene.tweens.add({
+            targets: this.container,
+            x: newX,
+            duration: 350,
+            ease: 'Sine.easeInOut',
+            onComplete: () => {
+                if (this.popped || !this.container || !this.container.scene) return;
+                this.swayTween = this.scene.tweens.add({
+                    targets: this.container,
+                    x: { value: newX + this.swayAmount, duration: this.swayDuration, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' },
+                    rotation: { value: Phaser.Math.DegToRad(Phaser.Math.Between(-5, 5)), duration: this.swayDuration * 1.3, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' }
+                });
+            }
         });
     }
 

@@ -115,43 +115,79 @@ class GameOverScene extends Phaser.Scene {
             });
         });
 
-        // Play Again button — larger hit area for iPad touch targets
-        const btnBg = this.add.rectangle(w / 2, h * 0.75, 300, 80, 0x8b5a2b, 1) // Brown
-            .setStrokeStyle(4, 0x4a3b32)
-            .setInteractive({ useHandCursor: true })
-            .setAlpha(0)
-            .setDepth(100);
+        // Play Again button — DOM overlay for reliable touch on iPad
+        // Phaser's canvas touch input doesn't work reliably on iOS/iPad,
+        // so we create a real HTML button positioned over the canvas.
+        const container = document.getElementById('game-container');
+        const canvas = container.querySelector('canvas');
 
-        const btnText = this.add.text(w / 2, h * 0.75, 'Play Again ✨', {
-            fontFamily: 'Outfit',
-            fontSize: '22px',
-            fontStyle: '700',
-            color: '#ffffff',
-        }).setOrigin(0.5).setAlpha(0).setDepth(101);
+        const domBtn = document.createElement('button');
+        domBtn.id = 'play-again-btn';
+        domBtn.textContent = 'Play Again ✨';
+        domBtn.style.cssText = `
+            position: absolute;
+            z-index: 9999;
+            padding: 18px 48px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            background: #8b5a2b;
+            border: 4px solid #4a3b32;
+            border-radius: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.4s ease, transform 0.15s ease, background 0.15s ease;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        `;
+        container.style.position = 'relative';
+        container.appendChild(domBtn);
 
-        this.tweens.add({
-            targets: [btnBg, btnText],
-            alpha: 1,
-            duration: 400,
-            delay: 1000,
-            ease: 'Power2'
+        // Position the button at 50% x, 75% y of the canvas
+        const positionBtn = () => {
+            const rect = canvas.getBoundingClientRect();
+            const contRect = container.getBoundingClientRect();
+            const btnRect = domBtn.getBoundingClientRect();
+            domBtn.style.left = (rect.left - contRect.left + rect.width / 2 - btnRect.width / 2) + 'px';
+            domBtn.style.top = (rect.top - contRect.top + rect.height * 0.75 - btnRect.height / 2) + 'px';
+        };
+
+        // Fade in after delay (matches original timing)
+        this.time.delayedCall(1000, () => {
+            domBtn.style.opacity = '1';
+            positionBtn();
         });
 
-        btnBg.on('pointerover', () => {
-            btnBg.setFillStyle(0xa56e3a); // Lighter brown on hover
-            btnBg.setScale(1.05);
-            btnText.setScale(1.05);
+        // Hover effects (desktop)
+        domBtn.addEventListener('mouseenter', () => {
+            domBtn.style.background = '#a56e3a';
+            domBtn.style.transform = 'scale(1.05)';
+        });
+        domBtn.addEventListener('mouseleave', () => {
+            domBtn.style.background = '#8b5a2b';
+            domBtn.style.transform = 'scale(1)';
         });
 
-        btnBg.on('pointerout', () => {
-            btnBg.setFillStyle(0x8b5a2b);
-            btnBg.setScale(1);
-            btnText.setScale(1);
-        });
+        // Touch feedback (iPad/mobile)
+        domBtn.addEventListener('touchstart', () => {
+            domBtn.style.background = '#a56e3a';
+            domBtn.style.transform = 'scale(1.05)';
+        }, { passive: true });
 
-        // Use pointerup for better iOS/iPad compatibility
-        btnBg.on('pointerup', () => {
+        // Navigate on click/tap
+        domBtn.addEventListener('click', () => {
             window.location.href = 'index.html';
+        });
+
+        // Reposition on resize
+        this._resizeHandler = () => positionBtn();
+        window.addEventListener('resize', this._resizeHandler);
+
+        // Clean up DOM button when scene shuts down
+        this.events.on('shutdown', () => {
+            if (domBtn.parentNode) domBtn.parentNode.removeChild(domBtn);
+            window.removeEventListener('resize', this._resizeHandler);
         });
     }
 }

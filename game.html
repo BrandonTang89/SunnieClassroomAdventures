@@ -17,8 +17,9 @@
         let lastTouchEnd = 0;
         document.addEventListener('touchend', function (event) {
             const target = event.target;
-            if (target && (target.id === 'submit-btn' || target.closest('#submit-btn'))) {
-                return; // Don't block rapid taps on submit
+            if (target && (target.id === 'submit-btn' || target.closest('#submit-btn') ||
+                target.id === 'play-again-btn' || target.closest('#play-again-btn'))) {
+                return; // Don't block rapid taps on submit or play again
             }
             let now = (new Date()).getTime();
             if (now - lastTouchEnd <= 300) {

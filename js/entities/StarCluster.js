@@ -80,10 +80,31 @@ class StarCluster {
         // Check if all balloons are now popped → star falls
         if (popped > 0 && this.balloons.every(b => b.popped)) {
             this._startFalling();
+        } else if (popped > 0) {
+            // Re-center surviving balloons to fill the gap
+            this._reCenterBalloons();
         }
 
         return popped;
     }
+
+    /**
+     * Recalculate evenly-spaced positions for surviving balloons
+     * and smoothly animate them into place.
+     */
+    _reCenterBalloons() {
+        const alive = this.balloons.filter(b => !b.popped);
+        if (alive.length === 0) return;
+
+        const totalWidth = alive.length * 55;
+        const startX = this.starGfx.x - totalWidth / 2 + 27;
+
+        alive.forEach((balloon, i) => {
+            const targetX = startX + i * 55;
+            balloon.reCenter(targetX);
+        });
+    }
+
 
     _startFalling() {
         this.falling = true;

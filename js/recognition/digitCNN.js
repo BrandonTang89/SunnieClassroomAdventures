@@ -19,6 +19,9 @@ class DigitCNN {
         try {
             console.log('[DigitCNN] Loading model...');
 
+            // Fix for iOS Safari Web View / PWA direct navigation where WASM path resolution fails:
+            ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/';
+
             // Load class names
             const classResp = await fetch('model/class_names.json');
             this.classNames = await classResp.json();

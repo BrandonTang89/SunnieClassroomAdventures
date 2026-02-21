@@ -88,8 +88,8 @@ class TitleScene extends Phaser.Scene {
             });
         }
 
-        // Start off-screen to the right
-        const startX = w + 400;
+        // Start 80% away from the left initially
+        const startX = w * 0.8;
         this.minibus = this.add.sprite(startX, busY, 'sunnie_minibus');
         this.minibus.setScale(busScale);
         this.minibus.play('minibus_eat');
@@ -103,7 +103,11 @@ class TitleScene extends Phaser.Scene {
      * @param {number} w - Canvas width in pixels.
      */
     _driveMinibus(w) {
-        const duration = 18000; // ms to cross the full screen
+        // Calculate dynamic duration based on current position to keep speed constant.
+        // Original speed: traveled w + 800 pixels in 18000 ms.
+        const speed = (w + 800) / 18000;
+        const distanceToTravel = this.minibus.x - (-400);
+        const duration = distanceToTravel / speed;
 
         this.tweens.add({
             targets: this.minibus,
